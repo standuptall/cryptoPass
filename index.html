@@ -1,0 +1,66 @@
+<html>
+<head> 
+    <script type="text/javascript" src="node_modules/crypto-js/crypto-js.js"></script>
+    <script>
+        // Encrypt
+//var ciphertext = CryptoJS.AES.encrypt('my message', 'secret key 123').toString();
+
+function decrypt(keybase,ivbase,textb64){
+    var key = CryptoJS.enc.Base64.parse(keybase);   //16 bytes
+    var iv  = CryptoJS.enc.Base64.parse(ivbase);  //16 bytes
+    var anzi = CryptoJS.enc.Base64.parse(textb64);
+
+
+    var bytes  = CryptoJS.AES.decrypt({
+                ciphertext: anzi
+            }
+            , key, { iv: iv });
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+function encrypt(keybase,textb64){
+    var key = CryptoJS.enc.Base64.parse(keybase);   //16 bytes
+    var anzi = CryptoJS.enc.Utf8.parse(textb64);
+    const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+    var iv = CryptoJS.enc.Hex.parse(genRanHex(32));
+    var bytes  = CryptoJS.AES.encrypt(anzi,key,{ iv: iv });
+    let c =
+    {
+        iv: bytes.iv.toString(CryptoJS.enc.Base64),
+        crypt:  bytes.ciphertext.toString(CryptoJS.enc.Base64)
+    };
+    return c;
+}
+function decrypt_button(){
+    let key = document.getElementById("key").value;
+    let iv = document.getElementById("iv").value;
+    let pass = document.getElementById("passcry").value;
+    let val = decrypt(key,iv,pass);
+    document.getElementById("passde").value = val;
+}
+function encrypt_button(){
+    let key = document.getElementById("key").value;
+    let passde = document.getElementById("passde").value;
+    let ret = encrypt(key,passde);
+
+    
+    document.getElementById("iv").value = ret.iv;    
+    document.getElementById("passcry").value = ret.crypt;
+}
+
+    </script>
+</head>
+<body>
+    <input type="text" id="key">
+
+
+    <p>IV<input type="text" id="iv"></p>
+    <p>PASSCRYPT<input type="text" id="passcry"></p>
+    <button onClick="decrypt_button()">decrypt</button>
+
+    <p>PASSDECRYPT<input type="text" id="passde"></p>
+    <button onClick="encrypt_button()">encrypt</button>
+
+
+</body>
+</html>
